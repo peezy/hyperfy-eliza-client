@@ -1,5 +1,5 @@
 {
-    "name": "@elizaos/client-hyperfy",
+    "name": "hyperfy-eliza-client",
     "version": "1.0.0",
     "type": "module",
     "main": "dist/index.js",
