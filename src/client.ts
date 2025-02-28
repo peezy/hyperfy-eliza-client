@@ -143,45 +143,43 @@ export class HyperfyClient {
                 });
 
                 function createHyperfyOutSchema(body: any) {
-                    // Extract emotes and nearby (triggers) from the body
+                    // Extract emotes and triggers from the body
                     const emotes = body.emotes || [];
                     const triggers = body.triggers || [];
 
-                    // Create the lookAt schema based on triggers
+                    // Either accept any string (if triggers are empty) or the specific trigger values
                     const lookAtSchema =
-                        triggers.length > 1
-                            ? z
-                                  .union(
-                                      triggers.map((item: string) =>
-                                          z.literal(item)
-                                      ) as [
-                                          z.ZodLiteral<string>,
-                                          z.ZodLiteral<string>,
-                                          ...z.ZodLiteral<string>[]
-                                      ]
-                                  )
-                                  .nullable()
-                            : triggers.length === 1
-                            ? z.literal(triggers[0]).nullable()
-                            : z.null(); // Fallback for empty array
+                        triggers.length > 0
+                            ? z.union([
+                                z.union(
+                                    triggers.map((item: string) =>
+                                        z.literal(item)
+                                    ) as [
+                                        z.ZodLiteral<string>,
+                                        ...z.ZodLiteral<string>[]
+                                    ]
+                                ),
+                                z.string(), // Allow any string
+                                z.null(), // Also allow null
+                            ])
+                            : z.union([z.string(), z.null()]); // If no triggers, allow any string or null
 
-                    // Create the emote schema based on available emotes
+                    // Either accept any string (if emotes are empty) or the specific emote values
                     const emoteSchema =
-                        emotes.length > 1
-                            ? z
-                                  .union(
-                                      emotes.map((item: string) =>
-                                          z.literal(item)
-                                      ) as [
-                                          z.ZodLiteral<string>,
-                                          z.ZodLiteral<string>,
-                                          ...z.ZodLiteral<string>[]
-                                      ]
-                                  )
-                                  .nullable()
-                            : emotes.length === 1
-                            ? z.literal(emotes[0]).nullable()
-                            : z.null(); // Fallback for empty array
+                        emotes.length > 0
+                            ? z.union([
+                                z.union(
+                                    emotes.map((item: string) =>
+                                        z.literal(item)
+                                    ) as [
+                                        z.ZodLiteral<string>,
+                                        ...z.ZodLiteral<string>[]
+                                    ]
+                                ),
+                                z.string(), // Allow any string
+                                z.null(), // Also allow null
+                            ])
+                            : z.union([z.string(), z.null()]); // If no emotes, allow any string or null
 
                     return z.object({
                         lookAt: lookAtSchema,
@@ -372,3 +370,4 @@ const hyperfyPlugin: Plugin = {
 };
 
 export default hyperfyPlugin;
+
